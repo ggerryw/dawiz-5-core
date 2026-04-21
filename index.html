@@ -356,6 +356,56 @@
   <!-- Materialize JS Backend Framework -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
+  <!-- Google Apps Script API Shim (DaWiz 5.0 Headless Gateway) -->
+  <script>
+    // Paste your newly generated Apps Script Web App URL exactly inside these quotes!
+    const DAWIZ_API_URL = "YOUR_GOOGLE_WEB_APP_URL_HERE";
+
+    // 100% Client-Side replacement for google.script.run to easily port your UI to Netlify!
+    window.google = {
+      script: {
+        run: {
+          withSuccessHandler: function(successCallback) { this._success = successCallback; return this; },
+          withFailureHandler: function(failureCallback) { this._failure = failureCallback; return this; },
+          _success: () => {},
+          _failure: (err) => { console.error("DaWiz API Network Error:", err); alert("Network Error: " + err); },
+          
+          getAppBootState: async function() {
+            try {
+              let res = await fetch(DAWIZ_API_URL + "?action=getAppBootState");
+              let data = await res.json();
+              this._success(data);
+            } catch(e) { this._failure(e); }
+          },
+          getStandingsData: async function(ownerName) {
+            try {
+              let res = await fetch(DAWIZ_API_URL + "?action=getStandingsData&owner=" + encodeURIComponent(ownerName));
+              let data = await res.json();
+              this._success(data);
+            } catch(e) { this._failure(e); }
+          },
+          getDraftData: async function(ownerName) {
+            try {
+              let res = await fetch(DAWIZ_API_URL + "?action=getDraftData&owner=" + encodeURIComponent(ownerName));
+              let data = await res.json();
+              this._success(data);
+            } catch(e) { this._failure(e); }
+          },
+          registerData: async function(payload) {
+             try {
+               let res = await fetch(DAWIZ_API_URL, {
+                   method: 'POST',
+                   body: JSON.stringify({ action: "registerData", data: payload })
+               });
+               let data = await res.json();
+               this._success(data);
+             } catch(e) { this._failure(e); }
+          }
+        }
+      }
+    };
+  </script>
+
   <!-- Client-Side Routing and Logic -->
   <script>
     // --- GATEKEEPER STATE ---
