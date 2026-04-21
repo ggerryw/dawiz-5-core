@@ -359,44 +359,44 @@
   <!-- Google Apps Script API Shim (DaWiz 5.0 Headless Gateway) -->
   <script>
     // Paste your newly generated Apps Script Web App URL exactly inside these quotes!
-    const DAWIZ_API_URL = "https://script.google.com/macros/s/AKfycby2r7pXnAWx27CDaiS407JjmcXEii9XdWy6VDnwT8P8U3NfSPsy9z/exec";
+    const DAWIZ_API_URL = "https://script.google.com/macros/s/AKfycbxvmS8sYRIq06LLeY6cq-XIeb9-e6o4vpABXjqDIH4EJLmqdVe41Wo2v6DknDn9nE4z/exec
 
     // 100% Client-Side replacement for google.script.run to easily port your UI to Netlify!
     window.google = {
       script: {
         get run() {
           return {
-            _success: () => {},
+            _success: () => { },
             _failure: (err) => { console.error("DaWiz API Network Error:", err); alert("Network Error: " + err); },
-            withSuccessHandler: function(cb) { this._success = cb; return this; },
-            withFailureHandler: function(cb) { this._failure = cb; return this; },
-            
-            getAppBootState: async function() {
+            withSuccessHandler: function (cb) { this._success = cb; return this; },
+            withFailureHandler: function (cb) { this._failure = cb; return this; },
+
+            getAppBootState: async function () {
               try {
                 let res = await fetch(DAWIZ_API_URL + "?action=getAppBootState");
                 this._success(await res.json());
-              } catch(e) { this._failure(e); }
+              } catch (e) { this._failure(e); }
             },
-            getStandingsData: async function(ownerName) {
+            getStandingsData: async function (ownerName) {
               try {
                 let res = await fetch(DAWIZ_API_URL + "?action=getStandingsData&owner=" + encodeURIComponent(ownerName));
                 this._success(await res.json());
-              } catch(e) { this._failure(e); }
+              } catch (e) { this._failure(e); }
             },
-            getDraftData: async function(ownerName) {
+            getDraftData: async function (ownerName) {
               try {
                 let res = await fetch(DAWIZ_API_URL + "?action=getDraftData&owner=" + encodeURIComponent(ownerName));
                 this._success(await res.json());
-              } catch(e) { this._failure(e); }
+              } catch (e) { this._failure(e); }
             },
-            registerData: async function(payload) {
-               try {
-                 let res = await fetch(DAWIZ_API_URL, {
-                     method: 'POST',
-                     body: JSON.stringify({ action: "registerData", data: payload })
-                 });
-                 this._success(await res.json());
-               } catch(e) { this._failure(e); }
+            registerData: async function (payload) {
+              try {
+                let res = await fetch(DAWIZ_API_URL, {
+                  method: 'POST',
+                  body: JSON.stringify({ action: "registerData", data: payload })
+                });
+                this._success(await res.json());
+              } catch (e) { this._failure(e); }
             }
           };
         }
