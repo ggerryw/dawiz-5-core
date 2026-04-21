@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <!-- Viewport hardened with user-zoom enabled; matches Code.js addMetaTag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, shrink-to-fit=no" />
+
+  <!-- Materialize CSS Design System -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet" />
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <style>
+    :root {
+      --nav-height: 64px;
+    }
+
+    @media only screen and (max-width: 992px) {
+      :root {
+        --nav-height: 56px;
+      }
+    }
+
+    html,
+    body {
+      overflow-x: clip;
+      width: 100%;
+      -webkit-text-size-adjust: 100%;
+      background-color: #ffffff;
+      color: #000000;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-size: 20px;
+    }
+
+    @media only screen and (min-width: 993px) {
+      body {
+        font-size: 16px;
+      }
+    }
+
+    #spinner-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 10px;
+    }
+
+    .sticky-section-header {
+      position: -webkit-sticky;
+      position: sticky;
+      top: var(--nav-height);
+      z-index: 990;
+      padding: 10px 20px;
+      margin: 0 -20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .sticky-sub-header {
+      position: sticky;
+      top: calc(var(--nav-height) + 60px);
+      z-index: 980;
+    }
+
+    .container {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 0 4px !important;
+    }
+
+    @media only screen and (min-width: 993px) {
+      .container {
+        width: 85% !important;
+        max-width: 1280px !important;
+        padding: 0 1.5rem !important;
+      }
+    }
+
+    .hide-on-mobile {
+      display: none !important;
+    }
+
+    .show-on-mobile {
+      display: block !important;
+    }
+
+    /* --- ULTRA TIGHT TABLES --- */
+    .tight-table td,
+    .tight-table th,
+    .compact td,
+    .compact th {
+      padding: 1px 6px !important;
+      line-height: 1.1 !important;
+      font-size: 0.85em !important;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    /* --- COMPACT MOBILE ROWS --- */
+    .mobile-dense-row {
+      margin-bottom: 2px;
+      border-bottom: 1px solid #eeeeee !important;
+      padding: 4px 4px !important;
+      background: #ffffff !important;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mobile-dense-row .row-main {
+      flex: 1 1 65%;
+      overflow: hidden;
+      padding-right: 10px;
+    }
+
+    .mobile-dense-row .p-name {
+      font-weight: bold;
+      font-size: 18px !important;
+      color: #000000 !important;
+      display: inline;
+    }
+
+    .mobile-dense-row .p-meta {
+      font-size: 14px !important;
+      color: #212121 !important;
+      display: inline;
+      margin-left: 5px;
+    }
+
+    .mobile-dense-row .p-action {
+      flex: 1 0 auto;
+      text-align: right;
+      padding-top: 4px;
+    }
+
+    /* --- BRAND & UI --- */
+    .brand-logo {
+      font-size: 22px !important;
+    }
+
+    .btn-large,
+    .btn {
+      width: 100% !important;
+      margin: 10px 0 !important;
+      height: 70px !important;
+      line-height: 70px !important;
+      font-size: 24px !important;
+      font-weight: bold !important;
+      background-color: #0d47a1 !important;
+    }
+
+    .card-title {
+      font-weight: 300 !important;
+      color: #1a237e;
+    }
+
+    .cutline-row td {
+      opacity: 0.4;
+    }
+
+    .cutline-divider td {
+      border-top: 2px solid red !important;
+    }
+
+    .standings-card {
+      margin-top: 15px;
+      border-radius: 8px;
+    }
+
+    .score-badge {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    /* --- DESKTOP TABLE OVERRIDES --- */
+    @media only screen and (min-width: 993px) {
+      .hide-on-mobile {
+        display: table !important;
+      }
+
+      footer .hide-on-mobile,
+      div .hide-on-mobile {
+        display: block !important;
+      }
+
+      .show-on-mobile {
+        display: none !important;
+      }
+
+      .btn-large,
+      .btn {
+        width: auto !important;
+        height: auto !important;
+        line-height: normal !important;
+        font-size: 1rem !important;
+        font-weight: normal !important;
+      }
+
+      .mobile-dense-row .p-name {
+        font-size: 1.1rem !important;
+      }
+
+      .mobile-dense-row .p-meta {
+        font-size: 0.9rem !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Owners Dropdown Data Structure -->
+  <ul id="owners-dropdown" class="dropdown-content"></ul>
+
+  <!-- Global Loading Spinner (Always starts active) -->
+  <div id="spinner-container">
+    <div class="preloader-wrapper big active">
+      <div class="spinner-layer spinner-blue-only">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+          <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+    <p id="spinner-message" class="grey-text text-darken-1">Loading DaWiz 3.0...</p>
+  </div>
+
+  <!-- Main Navigation Bar -->
+  <div class="navbar-fixed hide" id="main-nav-wrapper">
+    <nav class="blue darken-4" id="main-nav">
+      <div class="nav-wrapper" style="padding: 0 20px;">
+        <a href="javascript:void(0);" ondblclick="engageAdminOverride()" onclick="goHome()" class="brand-logo">DaWiz PO
+          3.0</a>
+        <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+        <ul class="right hide-on-med-and-down">
+          <li><a href="https://dawiz.netlify.app">DaWiz Home</a></li>
+          <li id="nav-summary"><a href="javascript:void(0);" onclick="goHome()">Summary</a></li>
+          <li id="nav-detail"><a href="javascript:void(0);" onclick="fetchStandings()">Detail</a></li>
+          <li><a href="https://www.nhl.com/playoffs/2026/bracket" target="_blank">Bracket</a></li>
+          <li id="nav-owners"><a class="dropdown-trigger" href="#!" data-target="owners-dropdown">Owners<i
+                class="material-icons right">arrow_drop_down</i></a></li>
+          <li id="nav-draft"><a href="javascript:void(0);" onclick="loadDraftLogin()">Draft</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Mobile SideNav (Hamburger Content) -->
+  <ul class="sidenav" id="mobile-demo">
+    <li>
+      <div class="user-view">
+        <div class="background blue darken-4"></div>
+        <span class="white-text name">DaWiz Playoff Operations</span>
+        <span class="white-text email">V3.0 Application Interface</span>
+      </div>
+    </li>
+    <li><a href="https://dawiz.netlify.app" class="waves-effect"><i class="material-icons">home</i>DaWiz Home</a></li>
+    <li id="nav-summary-mobile"><a href="javascript:void(0);" onclick="goHomeSidenav()" class="waves-effect"><i
+          class="material-icons">dashboard</i>Summary</a></li>
+    <li id="nav-detail-mobile"><a href="javascript:void(0);" onclick="fetchStandingsSidenav()" class="waves-effect"><i
+          class="material-icons">leaderboard</i>Detail</a></li>
+    <li><a href="https://www.nhl.com/playoffs/2026/bracket" target="_blank" onclick="closeSidenav()"
+        class="waves-effect"><i class="material-icons">map</i>Bracket</a></li>
+    <li class="no-padding">
+      <ul class="collapsible collapsible-accordion">
+        <li>
+          <a class="collapsible-header waves-effect"><i class="material-icons">groups</i>Owners<i
+              class="material-icons right" style="margin-right:0;">arrow_drop_down</i></a>
+          <div class="collapsible-body">
+            <ul id="owners-dropdown-mobile-ul"></ul>
+          </div>
+        </li>
+      </ul>
+    </li>
+    <li id="nav-draft-mobile"><a href="javascript:void(0);" onclick="loadDraftLoginSidenav()" class="waves-effect"><i
+          class="material-icons">manage_accounts</i>Draft</a></li>
+  </ul>
+
+  <!-- Master Standings Container -->
+  <div id="standings-container" class="container hide"></div>
+
+
+
+  <!-- Public Landing Page / Home Route -->
+  <div id="landing-container" class="container hide">
+    <div class="row" style="margin-top: 5vh;">
+      <div class="col s12 center-align">
+        <i class="material-icons blue-text text-darken-3" style="font-size: 80px;">sports_hockey</i>
+        <h2 class="blue-text text-darken-4" style="font-weight: 300; margin-top: 10px;">DaWiz Playoffs 2026</h2>
+
+        <div id="landing-summary-area" style="margin: 40px auto; max-width: 600px; min-height: 150px;">
+          <!-- Inject Top 3 here via JS -->
+          <div class="preloader-wrapper small active">
+            <div class="spinner-layer spinner-blue-only">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div>
+              <div class="gap-patch">
+                <div class="circle"></div>
+              </div>
+              <div class="circle-clipper right">
+                <div class="circle"></div>
+              </div>
+            </div>
+          </div>
+          <p class="grey-text mt-3">Loading Leaderboard...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Client-Side UI Container -->
+  <!-- This is where our javascript will cleanly inject dynamically rendered components! -->
+  <div id="app-container" class="container hide">
+
+    <!-- Placeholder Login Card (Will be populated by JS later) -->
+    <div class="row" style="margin-top: 10vh;">
+      <div class="col s12">
+        <div class="card z-depth-3">
+          <div class="card-content">
+            <span class="card-title center-align">NHL Playoffs Login</span>
+            <p class="center-align grey-text">DaWiz PO 3.0</p>
+            <br>
+            <!-- The dynamically rendered login form container -->
+            <div id="login-form-area" class="center-align" style="font-size: 1.5rem;">
+              <i class="material-icons large grey-text text-lighten-2">account_circle</i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Materialize JS Backend Framework -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+  <!-- Client-Side Routing and Logic -->
+  <script>
+    // --- GATEKEEPER STATE ---
+    window.systemCutoffPassed = false;
+    window.isAdminOverride = false;
+
+    function setActiveNav(tabId) {
+      document.querySelectorAll('#main-nav-wrapper .right li').forEach(li => li.classList.remove('active'));
+      document.querySelectorAll('#mobile-demo > li').forEach(li => li.classList.remove('active'));
+      
+      if (tabId) {
+        const desktopEl = document.getElementById(tabId);
+        if (desktopEl) desktopEl.classList.add('active');
+        const mobileEl = document.getElementById(tabId + '-mobile');
+        if (mobileEl) mobileEl.classList.add('active');
+      }
+    }
+
+    function engageAdminOverride() {
+      window.isAdminOverride = true;
+      M.toast({ html: 'Admin Override Engaged: Cutoff Bypassed', classes: 'green darken-3 rounded', displayLength: 4000 });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Automatically initialize Materialize features globally
+      M.AutoInit();
+
+      // Ensure SideNav initialization is robust
+      var elems = document.querySelectorAll('.sidenav');
+      var instances = M.Sidenav.init(elems, {});
+
+      initializeApp();
+
+      // 2. Global View-Sync Logic
+      // Because the app renders dual layouts (Desktop Table vs Mobile Stack), 
+      // we must synchronize the checked state between the two versions of the same player.
+      document.body.addEventListener('change', function (e) {
+        if (e.target && e.target.classList && (e.target.classList.contains('draft-checkbox') || e.target.classList.contains('keeper-checkbox'))) {
+          const targetId = e.target.id;
+          const isChecked = e.target.checked;
+
+          // Find all clones (Desktop/Mobile version) that share the same ID
+          const clones = document.querySelectorAll(`input[id="${targetId}"]`);
+          clones.forEach(tc => {
+            if (tc !== e.target) tc.checked = isChecked;
+          });
+        }
+      });
+    });
+
+    function initializeApp() {
+      console.log("DaWiz 3.0 Client Interface Booting...");
+      document.getElementById("spinner-container").classList.add("hide");
+      document.getElementById("landing-container").classList.remove("hide");
+      document.getElementById("main-nav-wrapper").classList.remove("hide");
+      
+      setActiveNav('nav-summary');
+
+      google.script.run.withSuccessHandler((payload) => {
+        window.systemCutoffPassed = payload.isCutoffPassed;
+        renderDropdowns(payload.ownersList);
+      }).getAppBootState();
+
+      google.script.run
+        .withSuccessHandler(renderLandingSummary)
+        .withFailureHandler(err => console.error("Snapshot error:", err))
+        .getStandingsData("Guest");
+    }
+
+    /* Sidenav specific wrappers to ensure menu closes after click */
+    function goHomeSidenav() { closeSidenav(); goHome(); }
+    function showBracketSidenav() { closeSidenav(); }
+    function fetchStandingsSidenav() { closeSidenav(); fetchStandings(); }
+    function loadDraftLoginSidenav() { closeSidenav(); loadDraftLogin(); }
+    function closeSidenav() {
+      var instance = M.Sidenav.getInstance(document.getElementById('mobile-demo'));
+      if (instance) instance.close();
+    }
+
+    function renderDropdowns(ownersList) {
+      let dHtml = '';
+      let mHtml = '';
+      ownersList.forEach(owner => {
+        dHtml += `<li><a href="javascript:void(0);" onclick="reviewOwnerTeam('${owner}')" class="blue-text text-darken-3">${owner}</a></li>`;
+        mHtml += `<li><a href="javascript:void(0);" onclick="closeSidenav(); reviewOwnerTeam('${owner}')" class="waves-effect">${owner}</a></li>`;
+      });
+      document.getElementById('owners-dropdown').innerHTML = dHtml;
+      document.getElementById('owners-dropdown-mobile-ul').innerHTML = mHtml;
+
+      const dropdownElems = document.querySelectorAll('.dropdown-trigger');
+      M.Dropdown.init(dropdownElems, { constrainWidth: false, coverTrigger: false });
+
+      const collapseElems = document.querySelectorAll('.collapsible');
+      M.Collapsible.init(collapseElems, {});
+    }
+
+    function reviewOwnerTeam(name) {
+      setActiveNav('nav-owners');
+      if (!window.systemCutoffPassed && !window.isAdminOverride) {
+        document.getElementById("landing-container").classList.add("hide");
+        document.getElementById("standings-container").classList.add("hide");
+        document.getElementById("app-container").classList.remove("hide");
+        document.getElementById("spinner-container").classList.add("hide");
+        document.getElementById("app-container").innerHTML = `
+           <div class="center-align" style="margin-top: 10vh;">
+             <i class="material-icons red-text text-darken-3" style="font-size: 80px;">lock</i>
+             <h4 class="red-text text-darken-3">Data Restricted</h4>
+             <p class="grey-text text-darken-1" style="font-size: 1.2rem; max-width: 600px; margin: 20px auto;">
+               Rosters and live Standings are hidden until after the Draft Cutoff deadline has passed to ensure all owners draft independently.
+             </p>
+             <button class="btn blue darken-3 mt-4" style="padding: 0 40px;" onclick="goHome()">Return Home</button>
+           </div>
+         `;
+        closeSidenav();
+        return;
+      }
+
+      window.isReviewMode = true; // Engage Read-Only Review Mode!
+      document.getElementById("landing-container").classList.add("hide");
+      document.getElementById("standings-container").classList.add("hide");
+      document.getElementById("app-container").classList.add("hide");
+
+      document.getElementById("spinner-container").classList.remove("hide");
+      document.getElementById("spinner-message").innerText = `Loading ${name}'s Team...`;
+
+      google.script.run
+        .withSuccessHandler(renderDraftDashboard)
+        .withFailureHandler(err => {
+          document.getElementById("spinner-container").classList.add("hide");
+          console.error("Review Fetch Error:", err);
+          alert("Data Fetch Error: " + err);
+        })
+        .getDraftData(name);
+    }
+
+    function renderLandingSummary(payload) {
+      const area = document.getElementById("landing-summary-area");
+      if (!payload || payload.error || !payload.leaderboard || payload.leaderboard.length === 0) {
+        area.innerHTML = '<p class="grey-text">Leaderboard empty or compiling...</p>';
+        return;
+      }
+
+      let sumR2 = 0, sumR3 = 0, sumR4 = 0;
+      payload.leaderboard.forEach(o => {
+        sumR2 += o.r2; sumR3 += o.r3; sumR4 += o.r4;
+      });
+      let activeRound = sumR4 > 0 ? 4 : (sumR3 > 0 ? 3 : (sumR2 > 0 ? 2 : 1));
+
+      let headersHTML = `<th style="padding: 4px;">Owner</th>`;
+      for(let r=1; r<=4; r++) {
+         headersHTML += `<th style="padding: 4px;">Round ${r}</th>`;
+         if (r === activeRound) {
+            headersHTML += `<th style="padding: 4px; color: #69f0ae;">Overnight</th>`;
+         }
+      }
+
+      let html = `<div class="card z-depth-2 hoverable" style="border-radius: 8px;"><div class="card-content" style="padding: 0;"><div class="scroll-wrapper"><table class="striped centered tight-table" style="font-size: 0.9em;"><thead class="blue darken-3 white-text"><tr>${headersHTML}</tr></thead><tbody>`;
+
+      payload.leaderboard.forEach((o, idx) => {
+        let rankStyle = (idx === 0) ? `style="background-color: #fff8e1;"` : "";
+        let rowHTML = `<td style="text-align: left; padding: 2px 0 2px 10px;"><b>${o.ownerName}</b></td>`;
+        
+        for(let r=1; r<=4; r++) {
+           let isCurrent = (r === activeRound);
+           let roundPts = 0;
+           if (r===1) roundPts = o.r1;
+           if (r===2) roundPts = o.r2;
+           if (r===3) roundPts = o.r3;
+           if (r===4) roundPts = o.r4;
+
+           if (r < activeRound) {
+               rowHTML += `<td class="grey-text text-darken-2" style="padding: 2px;">${roundPts}</td>`;
+           } else if (isCurrent) {
+               rowHTML += `<td class="green-text text-darken-3" style="font-weight:bold; font-size: 1.1em; padding: 2px;">${o.totalPoints}</td>`;
+               
+               let deltaVal = o.delta !== 0 ? o.delta : '-';
+               let dColor = o.delta > 0 ? 'green-text' : (o.delta < 0 ? 'red-text' : 'grey-text');
+               rowHTML += `<td class="${dColor}" style="font-weight:bold; padding: 2px;">${deltaVal}</td>`;
+           } else {
+               rowHTML += `<td style="padding: 2px;">-</td>`;
+           }
+        }
+        
+        html += `<tr ${rankStyle}>${rowHTML}</tr>`;
+      });
+
+      html += '</tbody></table></div></div></div>';
+      area.innerHTML = html;
+      area.style.maxWidth = "800px";
+    }
+
+    function loadDraftLogin() {
+      setActiveNav('nav-draft');
+      window.isReviewMode = false; // Reset state explicitly
+      document.getElementById("landing-container").classList.add("hide");
+      document.getElementById("standings-container").classList.add("hide");
+      document.getElementById("app-container").classList.add("hide");
+
+      document.getElementById("spinner-container").classList.remove("hide");
+      document.getElementById("spinner-message").innerText = "Connecting to Server...";
+
+      google.script.run
+        .withSuccessHandler(renderLoginScreen)
+        .withFailureHandler(err => alert("Failed to reach Google Sheets API: " + err))
+        .getAppBootState();
+    }
+
+    function renderLoginScreen(payload) {
+      let ownersList = payload.ownersList;
+      // Hide global spinner as soon as API responds
+      document.getElementById("spinner-container").classList.add("hide");
+      document.getElementById("app-container").classList.remove("hide");
+
+      // Reconstruct login form area if it was destroyed by other views
+      let loginArea = document.getElementById("login-form-area");
+      if (!loginArea) {
+        document.getElementById('app-container').innerHTML = `
+            <div class="row" style="margin-top: 10vh;">
+              <div class="col s12">
+                <div class="card z-depth-3">
+                  <div class="card-content">
+                    <span class="card-title center-align">NHL Playoffs Login</span>
+                    <p class="center-align grey-text">DaWiz PO 3.0</p>
+                    <br>
+                    <div id="login-form-area" class="center-align" style="font-size: 1.5rem;">
+                      <i class="material-icons large grey-text text-lighten-2">account_circle</i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        loginArea = document.getElementById("login-form-area");
+      }
+
+      let dropdownHtml = `
+          <div class="input-field">
+            <select id="owner-select" required>
+              <option value="" disabled selected>Select your name</option>
+              ${ownersList.map(name => `<option value="${name}">${name}</option>`).join('')}
+            </select>
+            <label>Name</label>
+          </div>
+          <div class="input-field" style="margin-top: 2rem;">
+            <input id="pin-input" type="text" inputmode="numeric" required style="font-size: 3rem; height: 4.5rem; text-align: center;" />
+            <label for="pin-input" style="font-size: 1.5rem;">Enter PIN</label>
+          </div>
+          <button class="btn-large waves-effect waves-light blue darken-3" style="margin-top: 2rem;" onclick="executeAuth()">
+            Login Access
+            <i class="material-icons right">lock_open</i>
+          </button>
+        `;
+
+      loginArea.innerHTML = dropdownHtml;
+
+      // Re-initialize the Materialize select element now that it actually exists in the DOM
+      M.FormSelect.init(document.getElementById('owner-select'));
+
+      // Add 'Enter' key listener to the PIN input explicitly for smoother UX navigation
+      document.getElementById('pin-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          executeAuth();
+        }
+      });
+    }
+
+    function executeAuth() {
+      const name = document.getElementById("owner-select").value;
+      const pin = document.getElementById("pin-input").value;
+
+      if (!name || !pin) {
+        M.toast({ html: 'Select name and enter PIN.', classes: 'red rounded' });
+        return;
+      }
+
+      M.toast({ html: 'Authenticating...', classes: 'blue rounded' });
+
+      // 2. Ping the server API to validate PIN and Cutoff limits
+      google.script.run
+        .withSuccessHandler((response) => {
+          if (response.valid) {
+            M.toast({ html: 'Access Verified. Fetching Data.', classes: 'green rounded' });
+
+            window.isReviewMode = false; // Admin/Owner verified, enable Draft interactions!
+
+            document.getElementById('login-form-area').classList.add('hide');
+            document.getElementById('app-container').insertAdjacentHTML('beforeend', `
+                <div id="draft-loading" class="center-align" style="margin-top: 10vh;">
+                  <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div>
+                  </div>
+                  <h5 class="blue-text text-darken-3 mt-4">Loading Roster Data.</h5>
+                  <p class="grey-text">Loading Legacy arrays, Bench rules, and Playoff Mappings.</p>
+                </div>
+              `);
+
+            // 3. Request the massive Draft Data Payload!
+            google.script.run
+              .withSuccessHandler(renderDraftDashboard)
+              .withFailureHandler(err => alert("Data Fetch Error: " + err))
+              .getDraftData(name);
+
+          } else if (response.rickRoll) {
+            // The Cutoff trap has been sprung! 
+            document.getElementById('app-container').innerHTML = `
+                <div class="center-align" style="margin-top: 5vh;">
+                  <h4 class="red-text text-darken-3">Access Verified.</h4>
+                  <p class="grey-text">We have a special playoff status update for your account...</p>
+                  <br><br>
+                  <div class="video-container" style="max-width: 800px; margin: 0 auto;">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                  </div>
+                </div>
+              `;
+          } else {
+            M.toast({ html: 'Invalid PIN. Try again.', classes: 'red darken-2 rounded' });
+          }
+        })
+        .authenticateUser(name, pin);
+    }
+
+    function renderDraftDashboard(payload) {
+      document.getElementById("spinner-container").classList.add("hide");
+      document.getElementById("app-container").classList.remove("hide");
+
+      if (payload.error) {
+        document.getElementById('app-container').innerHTML = `<h5 class="red-text center-align" style="margin-top: 10vh;">API Error: ${payload.error}</h5>`;
+        return;
+      }
+
+      // Unhide Global Navigation uniquely
+      document.getElementById("main-nav-wrapper").classList.remove("hide");
+
+      // --- DATA MAPPING ENGINE ---
+      // We create a fast lookup dictionary to instantly attach full Player Objects to the incoming bare IDs!
+      const playerDict = {};
+      payload.masterScorers.forEach(p => playerDict[p.id] = p);
+
+      if (window.isReviewMode) {
+        renderReviewDashboard(payload, playerDict);
+        return;
+      }
+
+      let uniqueIdentified = false;
+
+      // Mathematically merge the master roster IDs with the bench IDs exactly as pulled from OTbyID
+      const combinedIds = [...payload.legacyIds, ...payload.benchIds];
+
+      const legacyRoster = combinedIds.map(id => {
+        const p = playerDict[id] || { id: id, name: "Name Unknown", team: "---", points: 0 };
+        const pTeamCode = String(p.team).trim().toUpperCase();
+        const isPlayoffBound = payload.playoffTeams.includes(pTeamCode);
+
+        // Unique Check: The absolutely first playoff-bound player in the top-down matrix is securely locked as their Unique! 
+        let isUnique = false;
+        if (isPlayoffBound && !uniqueIdentified) {
+          isUnique = true;
+          uniqueIdentified = true;
+        }
+
+        return { ...p, isPlayoffBound, isUnique };
+      });
+
+      // --- DYNAMIC DOM RENDERING ---
+      window.cachedPlayerDict = playerDict; // Safely export dictionary natively for rapid Review Board mapping
+      window.cachedOwnerString = payload.ownerName; // Safely export identity natively since the Dropdown node was destroyed!
+
+      // Define universal UX Review Trigger actively mounted
+      const reviewBtnHtml = window.isReviewMode ? '' : `<button class="btn-small waves-effect waves-light blue darken-3 right" onclick="reviewDraft()">Register Choices <i class="material-icons right">playlist_add_check</i></button>`;
+
+      // Part 1: Legacy Team
+      let part1Html = `
+          <div class="card blue lighten-5">
+            <div class="card-content">
+              <div class="sticky-section-header blue lighten-5">
+                <span class="card-title" style="margin-bottom: 0;">Part 1: Keepers & Bench ${reviewBtnHtml}</span>
+              </div>
+              <p style="margin-top: 10px;">Select 15 players. Teams not making the playoffs are greyed out and marked 'ELIMINATED'. Your top player is shown as unique.  You are limited to 15 players from this list (..if you are fortunate enough to have more than that)</p>
+              
+              <!-- Desktop Table View -->
+              <table class="striped highlight hide-on-mobile tight-table" style="margin-top: 1.5rem;">
+                <thead><tr><th>Player</th><th>Team</th><th>Pts</th><th>Status Form</th></tr></thead>
+                <tbody>
+        `;
+
+      // --- MOBILE STACKED VIEW (Part 1) ---
+      let part1MobileHtml = `<div class="show-on-mobile" style="margin-top: 1.5rem;">`;
+
+      legacyRoster.forEach(p => {
+        let rowClass = p.isPlayoffBound ? "" : "grey-text text-lighten-1";
+
+        const isSavedHistory = payload.legacySaved.includes(p.id);
+        const shouldCheck = (payload.legacySaved.length === 0) || isSavedHistory;
+        const checkStatus = shouldCheck ? "checked" : "";
+
+        let formCheckbox = p.isPlayoffBound
+          ? (p.isUnique ? `<input type="checkbox" class="keeper-checkbox hide" id="keep_${p.id}" checked /><span class="blue-text" style="font-weight: bold;">UNIQUE LOCKED</span>` : `<label><input type="checkbox" class="keeper-checkbox" id="keep_${p.id}" ${checkStatus} /><span>Keep</span></label>`)
+          : `<span class="grey-text">ELIMINATED</span>`;
+
+        // DESKTOP TABLE ROW
+        part1Html += `
+            <tr class="${rowClass}">
+              <td>${p.name}</td>
+              <td>${p.team}</td>
+              <td>${p.points}</td>
+              <td>${formCheckbox}</td>
+            </tr>
+           `;
+
+        // MOBILE CARD ROW (Single-Line Compact)
+        part1MobileHtml += `
+             <div class="mobile-dense-row ${rowClass}">
+               <div class="row-main">
+                 <span class="p-name">${p.name}</span>
+                 <span class="p-meta">${p.team} | ${p.points} Pts</span>
+               </div>
+               <div class="p-action">${formCheckbox}</div>
+             </div>
+           `;
+      });
+      part1Html += `</tbody></table> `;
+      part1MobileHtml += `</div>`;
+
+      // Merging views
+      part1Html += part1MobileHtml + `</div></div>`;
+
+      // Pre-filter the Master Scorers list completely purging ALL 11 global Uniques natively!
+      const draftEligibleScorers = payload.masterScorers.filter(p => !payload.allUniques.includes(p.id));
+
+      // Further filter out the user's OWN legacy/bench roster so they don't double-draft them!
+      const availablePool = draftEligibleScorers.filter(p => !combinedIds.includes(p.id));
+
+      // Split into Cart (Already Selected in DB) and Free Agents
+      const cartPlayers = [];
+      const freeAgents = [];
+
+      availablePool.forEach(p => {
+        // We only want playoff bound players going forward
+        const isPlayoffBound = payload.playoffTeams.includes(p.team);
+        if (!isPlayoffBound) return;
+
+        if (payload.draftSaved.includes(p.id)) {
+          cartPlayers.push(p);
+        } else {
+          freeAgents.push(p);
+        }
+      });
+
+      // Sort just in case League Scoring was out of order
+      cartPlayers.sort((a, b) => b.points - a.points);
+      freeAgents.sort((a, b) => b.points - a.points);
+
+      // --- Part 2: Draft Additions (General Players List) ---
+      let part2Html = `
+          <div class="card green lighten-5" style="margin-top: 2rem;">
+            <div class="card-content">
+              <div class="sticky-section-header green lighten-5">
+                <span class="card-title" style="margin-bottom: 0;">Part 2: Draft Additions ${reviewBtnHtml}</span>
+              </div>
+              <p style="margin-top: 10px;"><strong>INSTRUCTIONS:</strong> Check the boxes of players you want on your team. You can pick a maximum of 15 players from these two lists combined. The lists adjust as you register and edit the lists</p>
+              
+              <!-- Desktop Table View -->
+              <table class="striped highlight hide-on-mobile tight-table" style="margin-top: 1.5rem;">
+                <thead><tr><th>Player</th><th>Team</th><th>Pts</th><th>Draft Status</th></tr></thead>
+                <tbody>
+        `;
+
+      let part2MobileHtml = `<div class="show-on-mobile" style="margin-top: 1.5rem;">`;
+
+      // Render Cart (Already Checked)
+      cartPlayers.forEach(p => {
+        const formCheckbox = `
+                <label>
+                  <input type="checkbox" class="draft-checkbox" id="draft_${p.id}" checked />
+                  <span class="green-text text-darken-3"><b>Saved Pick</b></span>
+                </label>`;
+
+        part2Html += `
+            <tr>
+              <td>${p.name}</td><td>${p.team}</td><td>${p.points}</td>
+              <td>${formCheckbox}</td>
+            </tr>`;
+
+        part2MobileHtml += `
+             <div class="mobile-dense-row">
+               <div class="row-main">
+                 <span class="p-name">${p.name}</span>
+                 <span class="p-meta">${p.team} | ${p.points} Pts</span>
+               </div>
+               <div class="p-action">${formCheckbox}</div>
+             </div>`;
+      });
+
+      // Render Top 50 Remaining Free Agents (Unchecked)
+      const topScorers = freeAgents.slice(0, 50);
+      topScorers.forEach(p => {
+        const formCheckbox = `
+                <label>
+                  <input type="checkbox" class="draft-checkbox" id="draft_${p.id}" />
+                  <span>Draft</span>
+                </label>`;
+
+        part2Html += `
+            <tr>
+              <td>${p.name}</td><td>${p.team}</td><td>${p.points}</td>
+              <td>${formCheckbox}</td>
+            </tr>`;
+
+        part2MobileHtml += `
+             <div class="mobile-dense-row">
+               <div class="row-top">
+                 <span class="p-name">${p.name}</span>
+                 <span class="p-pts">${p.points} Pts</span>
+               </div>
+               <div class="row-bottom">
+                 <span class="p-team">${p.team}</span>
+                 <span class="p-action">${formCheckbox}</span>
+               </div>
+             </div>`;
+      });
+
+      part2Html += `</tbody></table> `;
+      part2MobileHtml += `</div>`;
+
+      part2Html += part2MobileHtml + `</div></div>`;
+
+      // --- Part 3: Master Playoff Lookup (Grouped by Team) ---
+      const teamsDict = {};
+      freeAgents.forEach(p => {
+        if (!teamsDict[p.team]) teamsDict[p.team] = [];
+        teamsDict[p.team].push(p);
+      });
+
+      let part3Html = `
+          <div class="card amber lighten-5" style="margin-top: 2rem;">
+            <div class="card-content">
+              <div class="sticky-section-header amber lighten-5">
+                <span class="card-title" style="margin-bottom: 0;">Part 3: Playoff Lookup ${reviewBtnHtml}</span>
+              </div>
+              <p style="margin-top: 10px;"><strong>INSTRUCTIONS:</strong> This player grouping can help you make choices if you're basing your picks on team.  Selection from Part 3 will show up in the Part 2 list after you register your choices.  You may have to deselect from Part 2 to make room for Part 3 picks.  </p>
+              <div class="row" style="margin-top: 1.5rem;">
+        `;
+
+      // Generate columns for each playoff bound team
+      for (const [teamCode, roster] of Object.entries(teamsDict).sort()) {
+        part3Html += `
+            <div class="col s12 m6 l4">
+              <h6 class="blue-text text-darken-3" style="font-weight: bold; margin-top: 1.5rem; text-align: center;">${teamCode}</h6>
+              <table class="striped compact">
+                <tbody>
+          `;
+        // Show top 15 remaining scorers per playoff team to keep DOM clean
+        roster.slice(0, 15).forEach(p => {
+          part3Html += `
+                  <tr>
+                    <td style="padding: 5px 0;">${p.name}</td>
+                    <td style="padding: 5px 0; text-align: right;">
+                      <label>
+                        <input type="checkbox" class="draft-checkbox wildcard-check" id="draft_p3_${p.id}" />
+                        <span>${p.points}</span>
+                      </label>
+                    </td>
+                  </tr>
+            `;
+        });
+        part3Html += `</tbody></table></div>`;
+      }
+      part3Html += `</div></div></div>`;
+
+      // Render dual-wrapper UI Container enabling seamless toggle states securely!
+      document.getElementById('app-container').innerHTML = `
+           <div id="draft-builder-view">
+             <h4 class="center-align blue-text text-darken-3" style="margin-bottom: 2rem; font-weight: 300;">DaWiz Playoff Draft - ${payload.ownerName}'s Team</h4>
+             ${part1Html} 
+             ${part2Html}
+             ${part3Html}
+           </div>
+           <div id="review-submission-view" class="hide"></div>
+        `;
+    }
+
+    function renderReviewDashboard(payload, playerDict) {
+      let lhsHtml = '';
+      let rhsHtml = '';
+
+      if (!payload.legacySaved || payload.legacySaved.length === 0) {
+        lhsHtml = `<tr><td colspan="5" class="center-align grey-text" style="padding: 20px;">No original team players registered yet.</td></tr>`;
+      } else {
+        payload.legacySaved.forEach(id => {
+          const p = playerDict[id] || { name: 'Unknown', team: '---', points: 0, delta: 0 };
+          const freq = payload.pickFreqs ? (payload.pickFreqs[id] || 0) : "?";
+          let deltaVal = p.delta !== 0 && p.delta !== undefined ? p.delta : '-';
+          let dColor = p.delta > 0 ? 'green-text' : (p.delta < 0 ? 'red-text lighten-1' : 'grey-text');
+          lhsHtml += `<tr><td style="text-align: left; padding-left: 15px;"><b>${p.name}</b></td><td>${p.team}</td><td>${p.points}</td><td class="${dColor}" style="font-weight:bold;">${deltaVal}</td><td>${freq}</td></tr>`;
+        });
+      }
+
+      if (!payload.draftSaved || payload.draftSaved.length === 0) {
+        rhsHtml = `<tr><td colspan="5" class="center-align grey-text" style="padding: 20px;">No additions registered yet.</td></tr>`;
+      } else {
+        payload.draftSaved.forEach(id => {
+          const p = playerDict[id] || { name: 'Unknown', team: '---', points: 0, delta: 0 };
+          const freq = payload.pickFreqs ? (payload.pickFreqs[id] || 0) : "?";
+          let deltaVal = p.delta !== 0 && p.delta !== undefined ? p.delta : '-';
+          let dColor = p.delta > 0 ? 'green-text' : (p.delta < 0 ? 'red-text lighten-1' : 'grey-text');
+          rhsHtml += `<tr><td style="text-align: left; padding-left: 15px;"><b>${p.name}</b></td><td>${p.team}</td><td>${p.points}</td><td class="${dColor}" style="font-weight:bold;">${deltaVal}</td><td>${freq}</td></tr>`;
+        });
+      }
+
+      document.getElementById('app-container').innerHTML = `
+           <div id="read-only-review-view">
+             <div class="sticky-section-header white" style="z-index: 995; border-bottom: 2px solid #1a237e; margin-bottom: 2rem; margin-top:0;">
+               <h4 class="center-align blue-text text-darken-3" style="margin: 0; font-weight: 300;">DaWiz Playoff Draft - ${payload.ownerName}'s Team</h4>
+             </div>
+             <div class="row">
+               <div class="col s12 m6">
+                 <div class="card blue lighten-5 z-depth-2">
+                   <div class="card-content" style="padding: 0;">
+                      <div class="sticky-sub-header blue lighten-5" style="padding: 10px 20px; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                        <h6 class="center-align blue-text text-darken-4" style="font-weight: bold; margin: 0;">Team & Bench Selection</h6>
+                      </div>
+                      <table class="striped tight-table centered">
+                        <thead class="blue darken-3 white-text"><tr><th>Player</th><th>Team</th><th>Pts</th><th>O/N</th><th>Shared</th></tr></thead>
+                        <tbody>${lhsHtml}</tbody>
+                      </table>
+                   </div>
+                 </div>
+               </div>
+               <div class="col s12 m6">
+                 <div class="card green lighten-5 z-depth-2">
+                   <div class="card-content" style="padding: 0;">
+                      <div class="sticky-sub-header green lighten-5" style="padding: 10px 20px; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                        <h6 class="center-align green-text text-darken-4" style="font-weight: bold; margin: 0;">Draft Additions</h6>
+                      </div>
+                      <table class="striped tight-table centered">
+                        <thead class="green darken-3 white-text"><tr><th>Player</th><th>Team</th><th>Pts</th><th>O/N</th><th>Shared</th></tr></thead>
+                        <tbody>${rhsHtml}</tbody>
+                      </table>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         `;
+    }
+
+    function reviewDraft() {
+      const ownerName = window.cachedOwnerString || "Unknown";
+
+      // Use Sets to automatically handle desktop/mobile element duplication
+      const keepersSet = new Set();
+      document.querySelectorAll('.keeper-checkbox:checked').forEach(cb => {
+        keepersSet.add(cb.id.replace('keep_', ''));
+      });
+      const keepers = Array.from(keepersSet);
+
+      // Separate Part 2 (General) and Part 3 (Lookup) to detect REAL user duplicates
+      const part2Set = new Set();
+      const part3Set = new Set();
+
+      document.querySelectorAll('.draft-checkbox:checked').forEach(cb => {
+        const id = cb.id.replace('draft_p3_', '').replace('draft_', '');
+        if (cb.classList.contains('wildcard-check')) {
+          part3Set.add(id);
+        } else {
+          part2Set.add(id);
+        }
+      });
+
+      // Detect actual overlap between sections
+      const duplicateNames = new Set();
+      part3Set.forEach(id => {
+        if (part2Set.has(id)) {
+          const pName = window.cachedPlayerDict[id] ? window.cachedPlayerDict[id].name : "Unknown Player";
+          duplicateNames.add(pName);
+        }
+      });
+
+      if (duplicateNames.size > 0) {
+        alert(`Duplicate: You selected the same player in Part 2 and Part 3: \n\n${Array.from(duplicateNames).join(', ')}\n\nUncheck the duplicate to ensure 15 unique players.`);
+        return;
+      }
+
+      // Combine all unique draft picks
+      const draftsSet = new Set([...part2Set, ...part3Set]);
+      const drafts = Array.from(draftsSet);
+
+      if (keepers.length > 15) {
+        alert(`You can only select up to 15 Legacy Keepers (you have ${keepers.length}).`);
+        return;
+      }
+
+      if (drafts.length !== 15) {
+        M.toast({ html: "Validation Error: You MUST select exactly 15 players from outside your regular season team! (Currently: " + drafts.length + ")", classes: 'red rounded' });
+        return;
+      }
+
+      let keepersList = "";
+      keepers.forEach((id, index) => {
+        const p = window.cachedPlayerDict[id];
+        if (p) {
+          const uniqueBadge = (index === 0) ? '<span class="new badge blue" data-badge-caption="Unique"></span>' : '';
+          keepersList += '<li class="collection-item"><div><b>' + p.name + '</b>' + uniqueBadge + '<span class="secondary-content grey-text" style="margin-right: 15px;">' + p.team + ' | ' + p.points + ' pts</span></div></li>';
+        }
+      });
+      if (keepers.length === 0) keepersList = '<li class="collection-item grey-text">No legacy lineup keepers selected.</li>';
+
+      let draftsList = "";
+      drafts.forEach(id => {
+        const p = window.cachedPlayerDict[id];
+        if (p) {
+          draftsList += '<li class="collection-item"><div><b>' + p.name + '</b><span class="secondary-content grey-text">' + p.team + ' | ' + p.points + ' pts</span></div></li>';
+        }
+      });
+
+      const totalPlayers = keepers.length + drafts.length;
+
+      const previewHtml = '<div class="card z-depth-3" style="margin-top: 5vh;">' +
+        '<div class="card-content">' +
+        '<span class="card-title center-align blue-text text-darken-3" style="font-weight: 300; font-size: 28px;">Roster Verification</span>' +
+        '<p class="center-align grey-text" style="margin-bottom: 2rem;">Verify your ' + totalPlayers + '-man playoff team before registering them. Use the "Go Back and Edit" button to make changes.</p>' +
+        '<div class="row">' +
+        '<div class="col s12 m6">' +
+        '<h6 class="blue-text text-darken-3" style="font-weight: bold; margin-bottom: 1rem;"><i class="material-icons left" style="font-size: 20px; margin-top: -2px;">security</i> Legacy Keepers (' + keepers.length + '/15)</h6>' +
+        '<ul class="collection">' + keepersList + '</ul>' +
+        '</div>' +
+        '<div class="col s12 m6">' +
+        '<h6 class="green-text text-darken-3" style="font-weight: bold; margin-bottom: 1rem;"><i class="material-icons left" style="font-size: 20px; margin-top: -2px;">add_circle</i> Draft Additions (' + drafts.length + '/15)</h6>' +
+        '<ul class="collection">' + draftsList + '</ul>' +
+        '</div>' +
+        '</div>' +
+        '<div class="center-align" style="margin-top: 2rem;">' +
+        '<button class="btn-flat waves-effect waves-grey mr-3" onclick="cancelReview()">Go Back & Edit</button> &nbsp; &nbsp; ' +
+        '<button class="btn waves-effect waves-light blue darken-3" id="final-submit-btn" onclick="submitDraft()">Confirm & Lock Roster <i class="material-icons right">lock</i></button>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+      window.pendingPayload = { owner: ownerName, keepers: keepers, drafts: drafts };
+
+      document.getElementById('review-submission-view').innerHTML = previewHtml;
+      document.getElementById('draft-builder-view').classList.add('hide');
+      document.getElementById('review-submission-view').classList.remove('hide');
+      window.scrollTo(0, 0);
+    }
+
+    function cancelReview() {
+      document.getElementById('review-submission-view').classList.add('hide');
+      document.getElementById('draft-builder-view').classList.remove('hide');
+      window.scrollTo(0, 0);
+    }
+
+    function submitDraft() {
+      M.toast({ html: 'Saving your choices to the database...', classes: 'blue rounded' });
+      const btn = document.getElementById("final-submit-btn");
+      if (btn) btn.classList.add("disabled");
+
+      google.script.run
+        .withSuccessHandler(res => {
+          if (res.success) {
+            document.getElementById('review-submission-view').innerHTML = '<div class="card z-depth-3 center-align" style="margin-top: 10vh; padding: 4rem;">' +
+              '<i class="material-icons large green-text">check_circle</i>' +
+              '<h4 class="blue-text text-darken-3">Roster Saved.</h4>' +
+              '<p class="grey-text">Roster is stored in database.</p>' +
+              '</div>';
+          } else {
+            if (btn) btn.classList.remove("disabled");
+            M.toast({ html: 'Error storing roster: ' + res.error, classes: 'red darken-2 rounded' });
+          }
+        })
+        .withFailureHandler(err => {
+          if (btn) btn.classList.remove("disabled");
+          alert("Backend execution failed: " + err);
+        })
+        .registerData(window.pendingPayload);
+    }
+
+    // --- STANDINGS DASHBOARD LOGIC ---
+    function goHome() {
+      setActiveNav('nav-summary');
+      document.getElementById("app-container").classList.add("hide");
+      document.getElementById("standings-container").classList.add("hide");
+      document.getElementById("spinner-container").classList.remove("hide");
+      document.getElementById("spinner-message").innerText = "Returning to Base...";
+      initializeApp();
+    }
+
+    function fetchStandings() {
+      setActiveNav('nav-detail');
+      if (!window.systemCutoffPassed && !window.isAdminOverride) {
+        document.getElementById("landing-container").classList.add("hide");
+        document.getElementById("app-container").classList.add("hide");
+        document.getElementById("standings-container").classList.remove("hide");
+        document.getElementById("spinner-container").classList.add("hide");
+        document.getElementById("standings-container").innerHTML = `
+           <div class="center-align" style="margin-top: 10vh;">
+             <i class="material-icons red-text text-darken-3" style="font-size: 80px;">lock</i>
+             <h4 class="red-text text-darken-3">Data Restricted</h4>
+             <p class="grey-text text-darken-1" style="font-size: 1.2rem; max-width: 600px; margin: 20px auto;">
+               Rosters and live Standings are hidden until after the Draft Cutoff deadline has passed to ensure all owners draft independently.
+             </p>
+             <button class="btn blue darken-3 mt-4" style="padding: 0 40px;" onclick="goHome()">Return Home</button>
+           </div>
+         `;
+        closeSidenav();
+        return;
+      }
+
+      document.getElementById("landing-container").classList.add("hide");
+      document.getElementById("app-container").classList.add("hide");
+      document.getElementById("standings-container").classList.add("hide");
+      document.getElementById("spinner-container").classList.remove("hide");
+      document.getElementById("spinner-message").innerText = "Calculating Live Standings...";
+
+      const ownerName = window.cachedOwnerString || "Guest";
+      google.script.run
+        .withSuccessHandler(renderStandings)
+        .withFailureHandler(err => {
+          console.error("Standings Load Error:", err);
+          alert("Error loading standings: " + err);
+          goHome();
+        })
+        .getStandingsData(ownerName);
+    }
+
+    function showDraftBoard() {
+      document.getElementById("landing-container").classList.add("hide");
+      document.getElementById("standings-container").classList.add("hide");
+      document.getElementById("spinner-container").classList.add("hide");
+      document.getElementById("app-container").classList.remove("hide");
+    }
+
+    function renderStandings(payload) {
+      document.getElementById("spinner-container").classList.add("hide");
+      document.getElementById("standings-container").classList.remove("hide");
+      document.getElementById("main-nav-wrapper").classList.remove("hide");
+
+      let html = `<h4 class="center-align blue-text text-darken-3" style="margin-top: 2rem; font-weight: 300;">DaWiz Playoff Matrix</h4>
+                    <p class="center-align grey-text mb-4" style="line-height: 1.6;">
+                      The points from eliminated players are accumulated in the banked row. Players outside your top 25 show with strikethrough.<br>
+                      <span style="background-color: #ffecb3; font-weight: bold; color: #d84315; border-radius: 4px; box-shadow: inset 0 0 2px #ffca28; padding: 2px 6px; margin: 0 2px;">Hilighted</span> players are unique to you.
+                    </p>`;
+
+      html += `<div class="scroll-wrapper" style="overflow-x: auto; overflow-y: auto; max-height: 75vh; border: 1px solid #ccc; background-color: #fff; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                  <table class="centered matrix-table tight-table" style="white-space: nowrap; font-size: 13px; border-collapse: separate; border-spacing: 0;">
+                    <thead class="blue darken-3 white-text">
+                      <tr>
+                        <th style="text-align: left; position: sticky; top: 0; left: 0; background-color: #1565c0; z-index: 30; box-shadow: inset -3px -2px 5px -3px rgba(0,0,0,0.5); padding-left: 15px; padding-top: 10px; padding-bottom: 10px; min-width: 250px;">
+                          <div style="display: flex; justify-content: space-between;">
+                            <span>Players</span><span style="margin-right: 10px;">O/N</span>
+                          </div>
+                        </th>`;
+
+      payload.leaderboard.forEach(owner => {
+        html += `<th style="position: sticky; top: 0; background-color: #1565c0; z-index: 20; box-shadow: inset 0 -2px 5px -3px rgba(0,0,0,0.5); padding-top: 10px; padding-bottom: 10px;">${owner.ownerName}</th>`;
+      });
+
+      html += `     </tr>
+                    </thead>
+                    <tbody>
+                      <tr style="border-bottom: 2px solid #0d47a1; background-color: #90caf9 !important; font-weight: bold; font-size: 14px;">
+                        <td style="text-align: left; position: sticky; left: 0; background-color: #90caf9; z-index: 10; box-shadow: inset -3px 0 5px -3px rgba(0,0,0,0.2); padding-left: 15px;">
+                          Total Points
+                        </td>`;
+
+      payload.leaderboard.forEach(owner => {
+        html += `<td class="blue-text text-darken-4" style="background-color: #90caf9;">${owner.totalPoints}</td>`;
+      });
+
+      html += `     </tr>
+                      <tr style="border-bottom: 2px solid #2e7d32; background-color: #c8e6c9 !important; font-weight: bold; font-size: 14px;">
+                        <td style="text-align: left; position: sticky; left: 0; background-color: #c8e6c9; z-index: 10; box-shadow: inset -3px 0 5px -3px rgba(0,0,0,0.2); padding-left: 15px;">
+                          Overnight Totals
+                        </td>`;
+
+      payload.leaderboard.forEach(owner => {
+        let val = owner.delta !== 0 ? owner.delta : 0;
+        html += `<td class="green-text text-darken-4" style="background-color: #c8e6c9;">${val}</td>`;
+      });
+
+      html += `     </tr>
+                      <tr style="border-bottom: 3px solid #1a237e; background-color: #ef9a9a !important; font-weight: bold; font-size: 13px;">
+                        <td style="text-align: left; position: sticky; left: 0; background-color: #ef9a9a; z-index: 10; box-shadow: inset -3px 0 5px -3px rgba(0,0,0,0.2); padding-left: 15px;">Banked (Eliminated)</td>`;
+
+      payload.leaderboard.forEach(owner => {
+        html += `<td class="grey-text text-darken-4" style="background-color: #ef9a9a;">${owner.bankedPoints}</td>`;
+      });
+      html += `     </tr>`;
+
+      payload.yAxisActives.forEach((p, idx) => {
+        let isUnique = p.rarity === 1;
+        let rowBg = (idx % 2 === 0) ? "#ffffff" : "#cfd8dc"; // Distinct Steel Blue-Gray stripe
+        
+        let pDelta = p.points - (p.yesterday || 0);
+        let pDeltaStr = pDelta !== 0 ? pDelta : '-';
+        let dColor = pDelta > 0 ? "green-text text-darken-3" : (pDelta < 0 ? "red-text" : "grey-text");
+
+        html += `<tr style="background-color: ${rowBg} !important;">
+                      <td style="text-align: left; position: sticky; left: 0; background-color: ${rowBg}; z-index: 10; box-shadow: inset -3px 0 5px -3px rgba(0,0,0,0.2); border-right: 1px solid #c0c0c0; padding-left: 15px; font-weight: bold;">
+                         <div style="display: flex; justify-content: space-between;">
+                           <span>${p.name} <span class="grey-text text-darken-2" style="font-size: 11px;">(${p.team})</span></span>
+                           <span class="${dColor}" style="margin-right: 10px;">${pDeltaStr}</span>
+                         </div>
+                      </td>`;
+
+        payload.leaderboard.forEach(owner => {
+          const ownedPlayer = owner.actives[p.id];
+          let cellStyle = `background-color: ${rowBg}; border-right: 1px solid rgba(0,0,0,0.05);`;
+          if (ownedPlayer) {
+            if (ownedPlayer.isCnt) {
+              if (isUnique) {
+                html += `<td style="background-color: #ffecb3; font-weight: bold; color: #d84315; border-radius: 4px; box-shadow: inset 0 0 2px #ffca28;">${ownedPlayer.points}</td>`;
+              } else {
+                html += `<td style="${cellStyle} font-weight: bold;" class="blue-text text-darken-3">${ownedPlayer.points}</td>`;
+              }
+            } else {
+              html += `<td style="${cellStyle} text-decoration: line-through; color: #000000;" title="Currently sits below the Top 25 Cutline">${ownedPlayer.points}</td>`;
+            }
+          } else {
+            html += `<td style="${cellStyle}" class="grey-text text-lighten-2">-</td>`;
+          }
+        });
+        html += `</tr>`;
+      });
+
+      html += `   </tbody>
+                  </table>
+                 </div>`;
+
+      document.getElementById("standings-container").innerHTML = html;
+    }
+  </script>
+</body>
+
+</html>
