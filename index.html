@@ -359,48 +359,46 @@
   <!-- Google Apps Script API Shim (DaWiz 5.0 Headless Gateway) -->
   <script>
     // Paste your newly generated Apps Script Web App URL exactly inside these quotes!
-    const DAWIZ_API_URL = "YOUR_GOOGLE_WEB_APP_URL_HERE";
+    const DAWIZ_API_URL = "https://script.google.com/macros/s/AKfycby2r7pXnAWx27CDaiS407JjmcXEii9XdWy6VDnwT8P8U3NfSPsy9z/exec";
 
     // 100% Client-Side replacement for google.script.run to easily port your UI to Netlify!
     window.google = {
       script: {
-        run: {
-          withSuccessHandler: function(successCallback) { this._success = successCallback; return this; },
-          withFailureHandler: function(failureCallback) { this._failure = failureCallback; return this; },
-          _success: () => {},
-          _failure: (err) => { console.error("DaWiz API Network Error:", err); alert("Network Error: " + err); },
-          
-          getAppBootState: async function() {
-            try {
-              let res = await fetch(DAWIZ_API_URL + "?action=getAppBootState");
-              let data = await res.json();
-              this._success(data);
-            } catch(e) { this._failure(e); }
-          },
-          getStandingsData: async function(ownerName) {
-            try {
-              let res = await fetch(DAWIZ_API_URL + "?action=getStandingsData&owner=" + encodeURIComponent(ownerName));
-              let data = await res.json();
-              this._success(data);
-            } catch(e) { this._failure(e); }
-          },
-          getDraftData: async function(ownerName) {
-            try {
-              let res = await fetch(DAWIZ_API_URL + "?action=getDraftData&owner=" + encodeURIComponent(ownerName));
-              let data = await res.json();
-              this._success(data);
-            } catch(e) { this._failure(e); }
-          },
-          registerData: async function(payload) {
-             try {
-               let res = await fetch(DAWIZ_API_URL, {
-                   method: 'POST',
-                   body: JSON.stringify({ action: "registerData", data: payload })
-               });
-               let data = await res.json();
-               this._success(data);
-             } catch(e) { this._failure(e); }
-          }
+        get run() {
+          return {
+            _success: () => {},
+            _failure: (err) => { console.error("DaWiz API Network Error:", err); alert("Network Error: " + err); },
+            withSuccessHandler: function(cb) { this._success = cb; return this; },
+            withFailureHandler: function(cb) { this._failure = cb; return this; },
+            
+            getAppBootState: async function() {
+              try {
+                let res = await fetch(DAWIZ_API_URL + "?action=getAppBootState");
+                this._success(await res.json());
+              } catch(e) { this._failure(e); }
+            },
+            getStandingsData: async function(ownerName) {
+              try {
+                let res = await fetch(DAWIZ_API_URL + "?action=getStandingsData&owner=" + encodeURIComponent(ownerName));
+                this._success(await res.json());
+              } catch(e) { this._failure(e); }
+            },
+            getDraftData: async function(ownerName) {
+              try {
+                let res = await fetch(DAWIZ_API_URL + "?action=getDraftData&owner=" + encodeURIComponent(ownerName));
+                this._success(await res.json());
+              } catch(e) { this._failure(e); }
+            },
+            registerData: async function(payload) {
+               try {
+                 let res = await fetch(DAWIZ_API_URL, {
+                     method: 'POST',
+                     body: JSON.stringify({ action: "registerData", data: payload })
+                 });
+                 this._success(await res.json());
+               } catch(e) { this._failure(e); }
+            }
+          };
         }
       }
     };
@@ -415,7 +413,7 @@
     function setActiveNav(tabId) {
       document.querySelectorAll('#main-nav-wrapper .right li').forEach(li => li.classList.remove('active'));
       document.querySelectorAll('#mobile-demo > li').forEach(li => li.classList.remove('active'));
-      
+
       if (tabId) {
         const desktopEl = document.getElementById(tabId);
         if (desktopEl) desktopEl.classList.add('active');
@@ -461,7 +459,7 @@
       document.getElementById("spinner-container").classList.add("hide");
       document.getElementById("landing-container").classList.remove("hide");
       document.getElementById("main-nav-wrapper").classList.remove("hide");
-      
+
       setActiveNav('nav-summary');
 
       google.script.run.withSuccessHandler((payload) => {
@@ -555,11 +553,11 @@
       let activeRound = sumR4 > 0 ? 4 : (sumR3 > 0 ? 3 : (sumR2 > 0 ? 2 : 1));
 
       let headersHTML = `<th style="padding: 4px;">Owner</th>`;
-      for(let r=1; r<=4; r++) {
-         headersHTML += `<th style="padding: 4px;">Round ${r}</th>`;
-         if (r === activeRound) {
-            headersHTML += `<th style="padding: 4px; color: #69f0ae;">Overnight</th>`;
-         }
+      for (let r = 1; r <= 4; r++) {
+        headersHTML += `<th style="padding: 4px;">Round ${r}</th>`;
+        if (r === activeRound) {
+          headersHTML += `<th style="padding: 4px; color: #69f0ae;">Overnight</th>`;
+        }
       }
 
       let html = `<div class="card z-depth-2 hoverable" style="border-radius: 8px;"><div class="card-content" style="padding: 0;"><div class="scroll-wrapper"><table class="striped centered tight-table" style="font-size: 0.9em;"><thead class="blue darken-3 white-text"><tr>${headersHTML}</tr></thead><tbody>`;
@@ -567,28 +565,28 @@
       payload.leaderboard.forEach((o, idx) => {
         let rankStyle = (idx === 0) ? `style="background-color: #fff8e1;"` : "";
         let rowHTML = `<td style="text-align: left; padding: 2px 0 2px 10px;"><b>${o.ownerName}</b></td>`;
-        
-        for(let r=1; r<=4; r++) {
-           let isCurrent = (r === activeRound);
-           let roundPts = 0;
-           if (r===1) roundPts = o.r1;
-           if (r===2) roundPts = o.r2;
-           if (r===3) roundPts = o.r3;
-           if (r===4) roundPts = o.r4;
 
-           if (r < activeRound) {
-               rowHTML += `<td class="grey-text text-darken-2" style="padding: 2px;">${roundPts}</td>`;
-           } else if (isCurrent) {
-               rowHTML += `<td class="green-text text-darken-3" style="font-weight:bold; font-size: 1.1em; padding: 2px;">${o.totalPoints}</td>`;
-               
-               let deltaVal = o.delta !== 0 ? o.delta : '-';
-               let dColor = o.delta > 0 ? 'green-text' : (o.delta < 0 ? 'red-text' : 'grey-text');
-               rowHTML += `<td class="${dColor}" style="font-weight:bold; padding: 2px;">${deltaVal}</td>`;
-           } else {
-               rowHTML += `<td style="padding: 2px;">-</td>`;
-           }
+        for (let r = 1; r <= 4; r++) {
+          let isCurrent = (r === activeRound);
+          let roundPts = 0;
+          if (r === 1) roundPts = o.r1;
+          if (r === 2) roundPts = o.r2;
+          if (r === 3) roundPts = o.r3;
+          if (r === 4) roundPts = o.r4;
+
+          if (r < activeRound) {
+            rowHTML += `<td class="grey-text text-darken-2" style="padding: 2px;">${roundPts}</td>`;
+          } else if (isCurrent) {
+            rowHTML += `<td class="green-text text-darken-3" style="font-weight:bold; font-size: 1.1em; padding: 2px;">${o.totalPoints}</td>`;
+
+            let deltaVal = o.delta !== 0 ? o.delta : '-';
+            let dColor = o.delta > 0 ? 'green-text' : (o.delta < 0 ? 'red-text' : 'grey-text');
+            rowHTML += `<td class="${dColor}" style="font-weight:bold; padding: 2px;">${deltaVal}</td>`;
+          } else {
+            rowHTML += `<td style="padding: 2px;">-</td>`;
+          }
         }
-        
+
         html += `<tr ${rankStyle}>${rowHTML}</tr>`;
       });
 
@@ -1299,7 +1297,7 @@
       payload.yAxisActives.forEach((p, idx) => {
         let isUnique = p.rarity === 1;
         let rowBg = (idx % 2 === 0) ? "#ffffff" : "#cfd8dc"; // Distinct Steel Blue-Gray stripe
-        
+
         let pDelta = p.points - (p.yesterday || 0);
         let pDeltaStr = pDelta !== 0 ? pDelta : '-';
         let dColor = pDelta > 0 ? "green-text text-darken-3" : (pDelta < 0 ? "red-text" : "grey-text");
